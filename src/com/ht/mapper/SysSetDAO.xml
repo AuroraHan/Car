@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- mybatis的dtd文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace属性： 用于指定指向那个接口 -->
+<mapper namespace="com.ht.mapper.SysSetDAO">
+	<!-- 查看明细-->
+	<select id="getSet" resultType="sysSetVo">
+		<![CDATA[
+			select * from sysset
+		]]>
+	</select>
+	<!-- 修改设置 -->
+	<update id="updateSet" parameterType="sysSetVo">
+		<![CDATA[
+			update sysset set mianfeiTime=#{mianfeiTime},shoufeiTime=#{shoufeiTime},shoufeiMoney=#{shoufeiMoney}
+		]]>
+	</update>
+</mapper>

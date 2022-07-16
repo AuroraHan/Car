@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- mybatis的dtd文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace属性： 用于指定指向那个接口 -->
+<mapper namespace="com.ht.mapper.CarInfoDAO">
+	<!-- 注册车主信息 -->
+	<insert id="carAdd" parameterType="carInfoVo">
+		<![CDATA[
+			insert into carinfo(carNo,userName,mobile,startDate,expireDate,remark,remainMoney) values(#{carNo},#{userName},#{mobile},#{startDate},#{expireDate},#{remark},#{remainMoney})
+		]]>
+	</insert>
+	<!-- 查找所有车主-->
+	<select id="findAll" parameterType="String" resultType="carInfoVo">
+		<![CDATA[
+			select * from carinfo 
+		]]>
+		<if test="carNo !=null and carNo!=''">
+			where carNo=#{carNo}
+		</if>
+		order by carInfoId desc
+	</select>
+	<!-- 通过车牌找车 -->
+	<select id="findCarbyCarId" parameterType="String" resultType="carInfoVo">
+		select carInfoId,carNo,userName,mobile,startDate,expireDate,DATEDIFF(expireDate,now()) AS diffDate,remark from carinfo where carNo = #{carNo}
+	</select>
+	<select id="get" parameterType="int" resultType="carInfoVo">
+		select * from carinfo where carInfoId=#{carInfoId}
+	</select>
+	<delete id="del" parameterType="int">
+		delete from carinfo where carInfoId=#{carInfoId}
+	</delete>
+	<!-- 修改车辆信息 -->
+	<update id="updateCarInfo" parameterType="carInfoVo">
+		<![CDATA[
+			update carinfo set carNo=#{carNo},userName=#{userName},mobile=#{mobile},startDate=#{startDate},expireDate=#{expireDate},remark=#{remark} where carInfoId=#{carInfoId}
+		]]>
+	</update>
+	<!-- 更新账户余额 -->
+	<update id="updateMoney" parameterType="carInfoVo">
+		<![CDATA[
+			update carinfo set remainMoney=remainMoney+#{remainMoney} where carInfoId=#{carInfoId}
+		]]>
+	</update>
+	
+</mapper>

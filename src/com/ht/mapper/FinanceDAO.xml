@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- mybatis的dtd文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace属性： 用于指定指向那个接口 -->
+<mapper namespace="com.ht.mapper.FinanceDAO">
+	<!-- 新增收费 -->
+	<insert id="financeAdd" parameterType="FinanceVo">
+		<![CDATA[
+			insert into finance(carNo,financeType,totalMoney,userName,oprTime,remark) values(#{carNo},#{financeType},#{totalMoney},#{userName},#{oprTime},#{remark})
+		]]>
+	</insert>
+	<!-- 查找所有缴费记录-->
+	<select id="findAll" parameterType="String" resultType="FinanceVo">
+		<![CDATA[
+			select * from finance 
+		]]>
+		<if test="carNo !=null and carNo!=''">
+			where carNo=#{carNo}
+		</if>
+		order by financeId desc
+	</select>
+	<!-- 月度统计收费记录-->
+	<select id="financeStat" parameterType="int"  resultType="FinanceVo">
+		select DATE_FORMAT(oprTime,'%Y%m') yearMonth,sum(totalMoney) totalMoney from finance where financeType=2 and DATE_FORMAT(oprTime,'%Y')=#{curYear}  group by yearMonth;
+	</select>
+	
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- mybatis的dtd文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace属性： 用于指定指向那个接口 -->
+<mapper namespace="com.ht.mapper.UserDAO">
+	<!-- 用户注册 -->
+	<insert id="reg" parameterType="userVo">
+		<![CDATA[
+			insert into users(userId,password,userName,mobile,status) values(#{userId},#{password},#{userName},#{mobile},#{status})
+		]]>
+	</insert>
+	<!-- 用户登录-->
+	<select id="login" parameterType="userVo" resultType="userVo">
+		<![CDATA[
+			select * from users where userId=#{userId} and password=#{password}
+		]]>
+	</select>
+	<!-- 用户列表 -->
+	<select id="userList" resultType="userVo">
+		select * from users
+	</select>
+	<!-- 按userId操作 -->
+	<select id="findById" parameterType="userVo" resultType="userVo">
+		<![CDATA[
+			select * from users where userId=#{userId}
+		]]>
+	</select>
+	<!-- 修改密码 -->
+	<update id="pwd" parameterType="userVo">
+		<![CDATA[
+			update users set password=#{password} where userId=#{userId}
+		]]>
+	</update>
+	<!-- 修改状态 -->
+	<update id="updStatus" parameterType="userVo">
+		update users set status=#{status} where userId=#{userId}
+	</update>
+</mapper>

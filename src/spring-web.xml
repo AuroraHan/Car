@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+<!--配置spring mvc-->
+    <!--1,开启springmvc注解模式
+    a.自动注册  DefaultAnnotationHandlerMapping, AnnotationMethodHandlerAdapter
+    b.默认提供一系列的功能:数据绑定，数字和日期的format@NumberFormat,@DateTimeFormat
+    c:xml,json的默认读写支持-->
+    <mvc:annotation-driven conversion-service="dateUtil">
+    </mvc:annotation-driven>
+
+    <!--2.静态资源默认servlet配置-->
+    <!--
+        1).加入对静态资源处理：排除后缀 js,gif,png, 等静态资源的请求不会进入控制器
+        2).允许使用 "/" 做整体映射
+    -->
+      <mvc:default-servlet-handler />
+    
+
+    <!--3：配置JSP 显示ViewResolver-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <!-- 配置WEB页面的根路径 -->
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <!-- 配置系统支持页面类型 -->
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--4:扫描web所有的 controller-->
+    <context:component-scan base-package="com.ht.controller"/>
+
+    <!-- FastJson注入 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <!-- 避免IE执行AJAX时,返回JSON出现下载文件 -->
+            <!-- FastJson -->
+            <bean id="fastJsonHttpMessageConverter"
+                  class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <!-- 这里顺序不能反，一定先写text/html,不然ie下出现下载提示 -->
+                        <value>text/html;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+                <property name="features">
+                    <array value-type="com.alibaba.fastjson.serializer.SerializerFeature">
+                        <!-- 避免循环引用 -->
+                        <value>DisableCircularReferenceDetect</value>
+                        <!-- 是否输出值为null的字段 -->
+                        <value>WriteMapNullValue</value>
+                        <!-- 数值字段如果为null,输出为0,而非null -->
+                        <value>WriteNullNumberAsZero</value>
+                        <!-- 字符类型字段如果为null,输出为"",而非null  -->
+                        <value>WriteNullStringAsEmpty</value>
+                        <!-- List字段如果为null,输出为[],而非null -->
+                        <value>WriteNullListAsEmpty</value>
+                        <!-- Boolean字段如果为null,输出为false,而非null -->
+                        <value>WriteNullBooleanAsFalse</value>
+                    </array>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 拦截器配置 -->
+    <mvc:interceptors>
+        <!-- 国际化拦截器 ,获取资源文件的后缀名称-->
+        <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+            <property name="paramName" value="lang"/>
+        </bean>
+    </mvc:interceptors>
+	<!-- 为整个系统的日期类型提供自动转换功能 -->
+    <bean id="dateUtil" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" >
+        <property name="converters" >
+            <list>
+                <bean class="com.base.DateUtil"></bean>
+            </list>
+        </property>
+    </bean>
+
+
+    <!-- 文件上传 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 配置文件上传最大大小（字节）这里是1M -->
+        <property name="maxUploadSize" value="10485760"/>
+    </bean>
+
+
+    <!-- 国际化资源文件的路径及前缀名称  
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"> 
+    --> 
+    <!-- 国际化资源文件的路径及前缀名称 -->
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+    
+        <!-- 表示多语言配置文件在根路径下，以i18n开头的文件-->
+        <property name="basename" value="classpath:i18n"/>
+        <property name="useCodeAsDefaultMessage" value="true"/>
+    </bean>
+	<!-- 获取本地   
+   <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver"/>  
+   -->
+    <!-- 配置SessionLocaleResolver用于将Locale对象存储于Session中供后续使用--> 
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"></bean>
+    
+</beans>
